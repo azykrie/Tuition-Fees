@@ -1,9 +1,12 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Admin\PaymentsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ClassRoomsController;
+use App\Http\Controllers\Admin\TuitionFeesController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -18,5 +21,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('/users', UsersController::class);
     Route::get('/export/csv', [UsersController::class, 'exportCsv'])->name('export.csv');
     Route::get('/export/sql', [UsersController::class, 'exportSql'])->name('export.sql');
+    Route::resource('/class-rooms', ClassRoomsController::class);
+    Route::resource('/tuition-fees', TuitionFeesController::class);
+    Route::resource('/payments', PaymentsController::class);
 
 });

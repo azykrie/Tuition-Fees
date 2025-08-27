@@ -44,6 +44,59 @@
                 </div>
 
                 <div class="mb-5">
+                    <label for="role" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your
+                        role</label>
+                    <select name="role"
+                        class="shadow-xs bg-gray-50 border  text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        required>
+                        <option value="">Select a role</option>
+                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="student" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>Student
+                        </option>
+                    </select>
+                    @error('role')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- NIM (Student only) --}}
+                <div class="mb-5">
+                    <label for="nim" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        NIM
+                    </label>
+                    <input type="number" id="nim" name="nim" value="{{ old('nim') }}"
+                        class="shadow-xs bg-gray-50 border @error('nim') border-red-500 @enderror text-gray-900 text-sm rounded-md 
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+                    dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        placeholder="12345678">
+                    @error('nim')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Class Room (Student only) --}}
+                <div class="mb-5">
+                    <label for="class_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Class Room
+                    </label>
+                    <select id="class_id" name="class_id"
+                        class="shadow-xs bg-gray-50 border @error('class_id') border-red-500 @enderror text-gray-900 text-sm rounded-md 
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+                    dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                        <option value="">-- Select class --</option>
+                        @foreach ($classRooms as $classRoom)
+                            <option value="{{ $classRoom->id }}"
+                                {{ old('class_id', $user->class_id) == $classRoom->id ? 'selected' : '' }}>
+                                {{ $classRoom->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('class_id')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-5">
                     <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your
                         password</label>
                     <input type="password" name="password"

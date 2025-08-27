@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
+use App\Models\ClassRoom;
+use App\Models\ClassRooms;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
@@ -20,9 +22,12 @@ class UsersController extends Controller
         $users = User::query()
             ->when(
                 $search,
-                fn($q) =>
-                $q->where('name', 'like', "%{$search}%")
+                fn($query) =>
+                $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%")
+                    ->orWhere('class_id', 'like', "%{$search}%")
+                    ->orWhere('nim', 'like', "%{$search}%")
             )
             ->latest()
             ->paginate(10)
@@ -36,7 +41,8 @@ class UsersController extends Controller
      */
     public function create()
     {
-        return view('admin.users-table.create');
+        $classRooms = ClassRoom::all();
+        return view('admin.users-table.create', compact('classRooms'));
     }
 
     /**
@@ -48,11 +54,17 @@ class UsersController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:admin,student',
+            'class_id' => 'nullable|exists:class_rooms,id',
+            'nim' => 'nullable|string|max:255|unique:users',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'role' => $request->role,
+            'class_id' => $request->class_id,
+            'nim' => $request->nim,
             'password' => Hash::make($request->password),
         ]);
 
@@ -72,8 +84,9 @@ class UsersController extends Controller
      */
     public function edit(string $id)
     {
+        $classRooms = ClassRoom::all();
         $user = User::findOrFail($id);
-        return view('admin.users-table.edit', compact('user'));
+        return view('admin.users-table.edit', compact('user', 'classRooms'));
     }
 
     /**
@@ -84,12 +97,18 @@ class UsersController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'role' => 'required|in:admin,student',
             'password' => 'nullable|string|min:8|confirmed',
+            'class_id' => 'nullable|exists:class_rooms,id',
+            'nim' => 'nullable|string|max:255|unique:users',
         ]);
 
         $user = User::findOrFail($id);
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->role = $request->role;
+        $user->class_id = $request->class_id;
+        $user->nim = $request->nim;
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
@@ -125,7 +144,7 @@ class UsersController extends Controller
             fputcsv($handle, ['ID', 'Name', 'Email']);
 
             foreach ($users as $user) {
-                fputcsv($handle, [$user->id, $user->name, $user->email]);
+                fputcsv($handle, [$user->id, $user->name, $user->email, $user->role, $user->class_id, $user->nim]);
             }
             fclose($handle);
         };
@@ -140,7 +159,7 @@ class UsersController extends Controller
 
         $sql = "";
         foreach ($users as $user) {
-            $sql .= "INSERT INTO users (id, name, email) VALUES ($user->id, '$user->name', '$user->email');\n";
+            $sql .= "INSERT INTO users (id, name, email, role, class_id, nim) VALUES ($user->id, '$user->name', '$user->email', '$user->role', $user->class_id, '$user->nim');\n";
         }
 
         return response($sql)
