@@ -21,7 +21,11 @@ class LoginController extends Controller
 
         if(Auth::attempt($request->only('email', 'password'))){
             $request->session()->regenerate();
-            return redirect()->route('admin.dashboard.index')->with('success', 'You are logged in successfully.');
+            if(Auth::user()->role === 'admin'){
+                return redirect()->route('admin.dashboard.index')->with('success', 'You are logged in successfully.');
+            }else{
+                return redirect()->route('student.dashboard.index')->with('success', 'You are logged in successfully.');
+            }
         }
 
         return back()->with('error', 'The provided credentials do not match our records.')

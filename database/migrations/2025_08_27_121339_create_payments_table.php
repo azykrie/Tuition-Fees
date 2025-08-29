@@ -14,14 +14,14 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('tuition_fee_id')->constrained()->onDelete('cascade');
-            $table->decimal('amount_paid', 10, 2);
-            $table->date('payment_date');
+            $table->date('month');
+            $table->date('payment_date')->nullable();
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->timestamps();
         });
 
     }
-
+    
     /**
      * Reverse the migrations.
      */

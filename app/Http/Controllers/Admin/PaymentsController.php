@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Payment;
+use App\Models\TuitionFee;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class PaymentsController extends Controller
 {
@@ -15,11 +17,11 @@ class PaymentsController extends Controller
     {
         $search = $request->input('search');
         $payments = Payment::query()
-        ->when($search, function ($query) use ($search) {
-            return $query->where('name', 'like', "%{$search}%");
-        })
-        ->latest()
-        ->paginate();
+            ->when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate();
 
         return view('admin.payments.index', compact('payments', 'search'));
     }
@@ -29,7 +31,9 @@ class PaymentsController extends Controller
      */
     public function create()
     {
-        //
+        $students = User::where('role', 'student')->get();
+        $tuitionFees = TuitionFee::all();
+        return view('admin.payments.create', compact('students', 'tuitionFees'));
     }
 
     /**
@@ -37,7 +41,23 @@ class PaymentsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'tuition_fee_id' => 'required|exists:tuition_fees,id',
+            'month' => 'required|date',
+            'payment_date' => 'nullable|date',
+            'status' => 'required|in:pending,completed,failed',
+        ]);
+
+        Payment::create([
+            'user_id' => $request->user_id,
+            'tuition_fee_id' => $request->tuition_fee_id,
+            'month' => $request->month . '-01', 
+            'payment_date' => $request->payment_date,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('admin.payments.index')->with('success', 'Payment created successfully');
     }
 
     /**

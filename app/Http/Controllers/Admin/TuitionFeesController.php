@@ -63,7 +63,7 @@ class TuitionFeesController extends Controller
     public function edit(string $id)
     {
         $tuitionFee = TuitionFee::findOrFail($id);
-        return view("admin.tuition-fee.edit", compact('tuitionFee'));
+        return view("admin.tuition-fees.edit", compact('tuitionFee'));
     }
 
     /**

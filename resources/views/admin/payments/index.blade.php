@@ -83,6 +83,12 @@
                             Amount
                         </th>
                         <th scope="col" class="px-6 py-3">
+                            Month
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Payment Date
+                        </th>
+                        <th scope="col" class="px-6 py-3">
                             Status
                         </th>
                         <th scope="col" class="px-6 py-3">
@@ -95,8 +101,35 @@
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                             <th scope="row"
                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                {{ $payment->name }}
+                                {{ $payment->user->name }}
                             </th>
+
+                            <th scope="row"
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ $payment->tuitionFee->name }}
+                            </th>
+
+                            <th scope="row"
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                Rp. {{ number_format($payment->tuitionFee->amount) }}
+                            </th>
+
+                            <th scope="row"
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ $payment->month }}
+                            </th>
+
+
+                            <th scope="row"
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ $payment->payment_date }}
+                            </th>
+
+                            <th scope="row"
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {{ $payment->status }}
+                            </th>
+
                             <td class="px-6 py-4 flex items-center gap-3">
                                 <a href="{{ route('admin.payments.edit', $payment->id) }}"
                                     class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">
@@ -139,7 +172,7 @@
                                                     Are you sure you want to delete this class?
                                                 </h3>
                                                 <div class="flex items-center justify-center">
-                                                    <form action="{{ route('admin.class-rooms.destroy', $room->id) }}"
+                                                    <form action="{{ route('admin.payments.destroy', $payment->id) }}"
                                                         method="POST">
                                                         @csrf
                                                         @method('DELETE')
@@ -150,7 +183,7 @@
                                                             Yes, I'm sure
                                                         </button>
                                                     </form>
-                                                    <button data-modal-hide="popup-modal-{{ $room->id }}"
+                                                    <button data-modal-hide="popup-modal-{{ $payment->id }}"
                                                         type="button"
                                                         class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none 
                                    bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 
@@ -169,7 +202,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                 No Payments found.
                             </td>
                         </tr>

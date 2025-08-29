@@ -10,7 +10,16 @@ class Payment extends Model
         'user_id',
         'tuition_fee_id',
         'amount_paid',
+        'month',
         'payment_date',
         'status',
     ];
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+    public function tuitionFee(){
+        return $this->belongsTo(TuitionFee::class);
+    }
 }
