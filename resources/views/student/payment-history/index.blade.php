@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'My Tuition Fees')
+@section('title', 'Payment History')
 
 @section('content')
     <div class="container mx-auto mb-4">
@@ -8,7 +8,7 @@
         <div class="mb-2">
             <x-breadcrumb :links="[
                 'Home' => route('student.dashboard.index'),
-                'My Tuition Fees' => route('student.my-tuition-fees.index'),
+                'Payment History' => route('student.payment-history.index'),
             ]" />
         </div>
 
@@ -35,7 +35,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($payments as $payment)
+                    @forelse ($paymentHistory as $payment)
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ \Carbon\Carbon::parse($payment->month)->translatedFormat('F Y') }}
@@ -53,14 +53,10 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4">
-                                @if ($payment->status == 'pending')
-                                    <button onclick="payNow({{ $payment->id }})"
-                                        class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                        Pay
-                                    </button>
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
+                                <button 
+                                    class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                                    Print Receipt
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -74,34 +70,8 @@
             </table>
 
             <div class="mt-4">
-                {{ $payments->links() }}
+                {{ $paymentHistory->links() }}
             </div>
         </div>
     </div>
 @endsection
-
-@push('scripts')
-        <script>
-            function payNow(paymentId) {
-                fetch(`/student/payments/${paymentId}/pay`)
-                    .then(res => res.json())
-                    .then(data => {
-                        snap.pay(data.token, {
-                            onSuccess: function(result) {
-                                alert("Payment successful!");
-                                location.reload();
-                            },
-                            onPending: function(result) {
-                                alert("Waiting for payment...");
-                            },
-                            onError: function(result) {
-                                alert("Payment failed!");
-                            },
-                            onClose: function() {
-                                alert("You closed the popup without completing the payment");
-                            }
-                        });
-                    });
-            }
-    </script>
-@endpush

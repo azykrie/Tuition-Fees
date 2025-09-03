@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Payment;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class DashboardController extends Controller
 {
@@ -12,7 +14,20 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('admin.dashboard.index');
+        $totalStudents = User::where('role', 'student')->count();
+        $totalAdmin = User::where('role', 'admin')->count();
+        $totalAmount = Payment::where('status', 'completed')
+            ->with('tuitionFee')
+            ->get()
+            ->sum(fn($payment) => $payment->tuitionFee->amount);
+
+        $pendingTransactions = Payment::where('status', 'pending')
+            ->count();
+
+        $completedTransactions = Payment::where('status', 'completed')
+            ->count();
+
+        return view('admin.dashboard.index', compact('totalStudents', 'totalAdmin', 'totalAmount', 'pendingTransactions', 'completedTransactions'));
     }
 
     /**

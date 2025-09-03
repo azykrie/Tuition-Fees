@@ -15,6 +15,7 @@ class PaymentsController extends Controller
     {
         $payments = Payment::with('tuitionFee')
             ->where('user_id', auth()->id())
+            ->where('status', '!=', 'completed')
             ->paginate(10);
 
         return view("student.my-tuition-fees.index", compact('payments'));

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Students;
 
-use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class DashboardController extends Controller
 {
@@ -12,7 +13,29 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('student.dashboard.index');
+        $user = auth()->user();
+        $totalPending = Payment::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->with('tuitionFee')
+            ->get()
+            ->sum(fn($payment) => $payment->tuitionFee->amount);
+
+        $totalPaid = Payment::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->with('tuitionFee')
+            ->get()
+            ->sum(fn($payment) => $payment->tuitionFee->amount);
+
+        $pendingTransactions = Payment::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->count();
+
+        // 🔹 Jumlah transaksi completed
+        $completedTransactions = Payment::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->count();
+
+        return view('student.dashboard.index', compact('totalPending', 'totalPaid', 'pendingTransactions', 'completedTransactions'));
     }
 
     /**

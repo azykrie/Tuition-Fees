@@ -125,10 +125,15 @@
                                 {{ $payment->payment_date }}
                             </th>
 
-                            <th scope="row"
-                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                {{ $payment->status }}
-                            </th>
+                            <td class="px-6 py-4">
+                                @if ($payment->status == 'completed')
+                                    <span class="text-green-600 font-semibold">Success</span>
+                                @elseif($payment->status == 'pending')
+                                    <span class="text-yellow-600 font-semibold">Pending</span>
+                                @else
+                                    <span class="text-red-600 font-semibold">Failed</span>
+                                @endif
+                            </td>
 
                             <td class="px-6 py-4 flex items-center gap-3">
                                 <a href="{{ route('admin.payments.edit', $payment->id) }}"

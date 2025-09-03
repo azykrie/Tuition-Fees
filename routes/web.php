@@ -1,14 +1,16 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\PaymentHistory;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Admin\PaymentsController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Admin\PaymentsController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ClassRoomsController;
 use App\Http\Controllers\Admin\TuitionFeesController;
+use App\Http\Controllers\Students\SettingsController;
 use App\Http\Controllers\Students\PaymentsController as StudentPaymentsController;
 use App\Http\Controllers\Students\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Students\PayementHistoryController as StudentPaymentHistory;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -18,7 +20,7 @@ Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login.post');
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
     Route::resource('/dashboard', DashboardController::class);
     Route::resource('/users', UsersController::class);
     Route::get('/export/csv', [UsersController::class, 'exportCsv'])->name('export.csv');
@@ -26,12 +28,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('/class-rooms', ClassRoomsController::class);
     Route::resource('/tuition-fees', TuitionFeesController::class);
     Route::resource('/payments', PaymentsController::class);
+    Route::resource('/payment-history', PaymentHistory::class);
 
 });
 
-Route::prefix('student')->name('student.')->group(function () {
+Route::prefix('student')->name('student.')->middleware('role:student')->group(function () {
     Route::resource('/dashboard', StudentDashboardController::class);
     Route::resource('/my-tuition-fees', StudentPaymentsController::class);
     Route::get('/payments/{payment}/pay', [StudentPaymentsController::class, 'pay'])->name('payments.pay');
-    
+    Route::resource('/payment-history', StudentPaymentHistory::class);
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::get('/settings/edit', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings/update', [SettingsController::class, 'update'])->name('settings.update');
+
 });
