@@ -16,12 +16,10 @@ class CheckRole
             return redirect()->route('login');
         }
 
-        // kalau role user ada di daftar role, lanjutkan
         if (in_array($user->role, $roles)) {
             return $next($request);
         }
 
-        // kalau role tidak sesuai, redirect sesuai role user
         switch ($user->role) {
             case 'admin':
                 return redirect()->route('admin.dashboard.index');
